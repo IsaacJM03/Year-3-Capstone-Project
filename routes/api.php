@@ -20,8 +20,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
 
         // Donation Routes
-        Route::apiResource('donations', DonationController::class);
         Route::get('donations/nearby', [DonationController::class, 'nearby']);
+        Route::apiResource('donations', DonationController::class);
 
         // Claim Routes
         Route::apiResource('claims', ClaimController::class)->only(['index', 'store']);
