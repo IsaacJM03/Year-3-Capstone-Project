@@ -62,14 +62,15 @@ class Donation extends Model
      */
     public function scopeNearby($query, $latitude, $longitude, $radius = 10)
     {
-        return $query->selectRaw("*, 
-            ( 6371 * acos( cos( radians(?) ) * 
+        $haversine = "( 6371 * acos( cos( radians(?) ) * 
             cos( radians( pickup_latitude ) ) * 
             cos( radians( pickup_longitude ) - radians(?) ) + 
             sin( radians(?) ) * 
-            sin( radians( pickup_latitude ) ) ) ) AS distance", 
-            [$latitude, $longitude, $latitude])
-            ->having('distance', '<=', $radius)
-            ->orderBy('distance');
+            sin( radians( pickup_latitude ) ) ) )";
+
+        return $query
+            ->selectRaw("*, {$haversine} AS distance", [$latitude, $longitude, $latitude])
+            ->whereRaw("{$haversine} <= ?", [$latitude, $longitude, $latitude, $radius])
+            ->orderByRaw('distance');
     }
 }
