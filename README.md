@@ -1,66 +1,328 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Donation Redistribution App - Laravel 11 REST API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive REST API built with Laravel 11 and Passport authentication for connecting food donors (restaurants/supermarkets) with receivers (charities/orphanages). The system enables donation management, location-based matching, claims processing, campaigns, and detailed reporting.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Authentication**: JWT-based authentication using Laravel Passport
+- **Role-Based Access Control**: Three user roles (Admin, Donor, Receiver)
+- **Donation Management**: Create, update, list, and track food donations
+- **Location-Based Matching**: Find nearby donations using latitude/longitude
+- **Claims System**: Receivers can claim available donations
+- **Campaigns**: Receivers can create and manage fundraising campaigns
+- **Reports & Analytics**: Comprehensive statistics and reports
+- **Clean Architecture**: Organized under `/api/v1/` namespace
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3+
+- Composer
+- MySQL/PostgreSQL/SQLite
+- Laravel 11
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/IsaacJM03/Year-3-Capstone-Project.git
+   cd Year-3-Capstone-Project
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Setup environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Laravel Sponsors
+4. **Configure database** (edit `.env`)
+   ```
+   DB_CONNECTION=sqlite
+   DB_DATABASE=/path/to/database.sqlite
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. **Run migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-### Premium Partners
+6. **Setup Passport**
+   ```bash
+   php artisan passport:keys
+   php artisan passport:client --password
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+7. **Seed database** (optional)
+   ```bash
+   php artisan db:seed
+   ```
 
-## Contributing
+8. **Start the server**
+   ```bash
+   php artisan serve
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## API Endpoints
 
-## Code of Conduct
+Base URL: `http://localhost:8000/api/v1`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Authentication
 
-## Security Vulnerabilities
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/register` | Register new user | No |
+| POST | `/login` | Login user | No |
+| POST | `/logout` | Logout user | Yes |
+| GET | `/user` | Get authenticated user | Yes |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Register Request:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "role": "donor",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "latitude": 40.7128,
+  "longitude": -74.0060
+}
+```
+
+**Login Request:**
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+### Donations
+
+| Method | Endpoint | Description | Role Access |
+|--------|----------|-------------|-------------|
+| GET | `/donations` | List all donations | All |
+| POST | `/donations` | Create donation | Donor |
+| GET | `/donations/{id}` | Get donation details | All |
+| PUT | `/donations/{id}` | Update donation | Donor (owner) |
+| DELETE | `/donations/{id}` | Delete donation | Donor (owner), Admin |
+| GET | `/my-donations` | Get user's donations | Donor |
+
+**Query Parameters for Listing:**
+- `status`: Filter by status (available, claimed, completed, expired)
+- `food_type`: Filter by food type
+- `latitude`, `longitude`, `radius`: Location-based search
+
+**Create Donation Request:**
+```json
+{
+  "title": "Fresh Vegetables",
+  "description": "Assorted vegetables",
+  "food_type": "Vegetables",
+  "quantity": 50,
+  "unit": "kg",
+  "expiry_date": "2025-10-20",
+  "pickup_address": "123 Restaurant St",
+  "pickup_latitude": 40.7128,
+  "pickup_longitude": -74.0060,
+  "image_url": "https://example.com/image.jpg"
+}
+```
+
+### Claims
+
+| Method | Endpoint | Description | Role Access |
+|--------|----------|-------------|-------------|
+| GET | `/claims` | List all claims | All |
+| POST | `/claims` | Create claim | Receiver |
+| GET | `/claims/{id}` | Get claim details | All |
+| PUT | `/claims/{id}` | Update claim status | Donor (approve/reject), Receiver (update) |
+| DELETE | `/claims/{id}` | Delete claim | Receiver (owner), Admin |
+| GET | `/my-claims` | Get user's claims | Receiver |
+
+**Create Claim Request:**
+```json
+{
+  "donation_id": 1,
+  "pickup_time": "2025-10-15 14:00:00",
+  "notes": "Will pick up in the afternoon"
+}
+```
+
+**Update Claim (Donor - Approve/Reject):**
+```json
+{
+  "status": "approved"
+}
+```
+
+### Campaigns
+
+| Method | Endpoint | Description | Role Access |
+|--------|----------|-------------|-------------|
+| GET | `/campaigns` | List all campaigns | All |
+| POST | `/campaigns` | Create campaign | Receiver |
+| GET | `/campaigns/{id}` | Get campaign details | All |
+| PUT | `/campaigns/{id}` | Update campaign | Receiver (owner), Admin |
+| DELETE | `/campaigns/{id}` | Delete campaign | Receiver (owner), Admin |
+| GET | `/my-campaigns` | Get user's campaigns | Receiver |
+
+**Create Campaign Request:**
+```json
+{
+  "title": "Winter Food Drive",
+  "description": "Collecting food for families in need",
+  "goal_description": "Feed 100 families",
+  "target_items": "Canned goods, dry foods",
+  "start_date": "2025-10-15",
+  "end_date": "2026-01-15",
+  "status": "active",
+  "image_url": "https://example.com/campaign.jpg"
+}
+```
+
+### Reports
+
+| Method | Endpoint | Description | Role Access |
+|--------|----------|-------------|-------------|
+| GET | `/reports/statistics` | System statistics | Admin |
+| GET | `/reports/donations-by-food-type` | Donations grouped by food type | Admin |
+| GET | `/reports/top-donors` | Top donors by donation count | Admin |
+| GET | `/reports/top-receivers` | Top receivers by completed claims | Admin |
+| GET | `/reports/donations-over-time` | Donation trends over time | Admin |
+| GET | `/reports/user-report` | User-specific report | All (own data) |
+
+**Query Parameters:**
+- `limit`: Number of results (for top donors/receivers)
+- `period`: Time period (day, week, month, year) for donations over time
+
+## Authentication
+
+All protected endpoints require a Bearer token in the Authorization header:
+
+```
+Authorization: Bearer {your_access_token}
+```
+
+Get the token from login/register response:
+```json
+{
+  "success": true,
+  "data": {
+    "user": {...},
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+    "token_type": "Bearer"
+  }
+}
+```
+
+## Roles & Permissions
+
+### Admin
+- Full access to all endpoints
+- Can view all reports and statistics
+- Can manage any resource
+
+### Donor
+- Can create and manage their own donations
+- Can approve/reject claims on their donations
+- Can view all donations and campaigns
+
+### Receiver
+- Can create claims on available donations
+- Can create and manage campaigns
+- Can view their own statistics
+
+## Database Schema
+
+### Users Table
+- id, name, email, password
+- role (admin, donor, receiver)
+- phone, address
+- latitude, longitude
+- timestamps
+
+### Donations Table
+- id, donor_id
+- title, description, food_type
+- quantity, unit
+- expiry_date
+- pickup_address, pickup_latitude, pickup_longitude
+- status (available, claimed, completed, expired)
+- image_url, timestamps
+
+### Claims Table
+- id, donation_id, receiver_id
+- status (pending, approved, rejected, completed)
+- pickup_time, notes
+- timestamps
+
+### Campaigns Table
+- id, creator_id
+- title, description, goal_description
+- target_items
+- start_date, end_date
+- status (draft, active, completed, cancelled)
+- image_url, timestamps
+
+## Testing
+
+**Test Users** (password: `password`):
+- Admin: `admin@donation.app`
+- Donor 1: `donor@restaurant.com`
+- Donor 2: `donor@supermarket.com`
+- Receiver 1: `receiver@charity.org`
+- Receiver 2: `receiver@orphanage.org`
+
+## Response Format
+
+All responses follow a consistent JSON structure:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {...}
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "errors": {...}
+}
+```
+
+## Location-Based Matching
+
+The API supports location-based donation search using the Haversine formula to calculate distances:
+
+```
+GET /api/v1/donations?latitude=40.7128&longitude=-74.0060&radius=10
+```
+
+This returns donations within a 10km radius of the specified coordinates.
+
+## Technologies Used
+
+- **Laravel 11**: PHP framework
+- **Laravel Passport**: OAuth2 authentication
+- **Eloquent ORM**: Database interactions
+- **MySQL/SQLite**: Database
+- **RESTful API**: Clean API architecture
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-source and available under the MIT License.
+
+## Support
+
+For issues and questions, please open an issue on GitHub.
