@@ -5,11 +5,11 @@ A Laravel 11 RESTful API backend for connecting food donors (supermarkets, resta
 ## 🚀 Features
 
 - **Laravel Passport Authentication** - OAuth2-based API authentication
-- **Role-Based Access Control** - Donor, Receiver, and Admin roles
+- **Role-Based Access Control** - Donor, Receiver, and Admin and (Donor-Receiver) roles
 - **Donation Management** - Create, update, and manage food donations
 - **Claiming System** - Receivers can claim donations with approval workflow
-- **Location-Based Matching** - Find nearby donations using geo-filtering
-- **Campaign Management** - Create and manage awareness campaigns
+- **Location-Based Matching** - Find nearby donations using geo-filtering (surplus to requirements)
+- **Campaign Management** - Create and manage awareness campaigns (removed)
 - **Admin Analytics** - Reports and statistics for monitoring activities
 
 ## 📋 Requirements
