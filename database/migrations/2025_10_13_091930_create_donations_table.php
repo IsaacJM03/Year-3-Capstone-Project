@@ -13,18 +13,30 @@ return new class extends Migration
     {
         Schema::create('donations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('donor_id')->constrained('users')->onDelete('cascade');
+            $table->uuid('client_id')->unique()->comment('Client-generated UUID for offline idempotency (deduplication)');
+            
+            // Donor identification (polymorphic relationship approach)
+            $table->unsignedBigInteger('donor_id');
+            $table->string('donor_type')->comment('Model name: App\Models\User or App\Models\Organization');
+
             $table->string('title');
-            $table->text('description');
-            $table->string('category');
-            $table->integer('quantity');
-            $table->string('unit');
-            $table->date('expiry_date');
-            $table->enum('status', ['available', 'claimed', 'delivered', 'expired'])->default('available');
-            $table->string('pickup_location');
-            $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 11, 8)->nullable();
-            $table->string('image_url')->nullable();
+            $table->text('description')->nullable();
+            
+            $table->float('quantity_est_kg')->nullable()->comment('Estimated quantity in kilograms');
+            $table->string('storage_condition')->nullable(); // e.g., 'refrigerated', 'ambient'
+            
+            $table->timestamp('pickup_from')->comment('ISO8601 UTC start time for pickup window');
+            $table->timestamp('pickup_to')->comment('ISO8601 UTC end time for pickup window');
+
+            $table->string('address');
+            $table->decimal('lat', 10, 8);
+            $table->decimal('lng', 11, 8);
+
+            // Statuses from spec (Page 17)
+            $table->enum('status', ['available', 'requested', 'reserved', 'cancelled', 'completed'])
+                  ->default('available');
+            $table->enum('visibility', ['public', 'private'])->default('public');
+
             $table->timestamps();
         });
     }
@@ -37,3 +49,4 @@ return new class extends Migration
         Schema::dropIfExists('donations');
     }
 };
+
