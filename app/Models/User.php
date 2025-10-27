@@ -23,6 +23,7 @@ class User extends Authenticatable
         'role',          // donor_individual, donor_company, receiver, volunteer, admin (Page 3)
         'org_name',      // temporary field for registration payload (Page 3)
         'organization_id', // Link to Organization model if user is part of one
+        // 'address',
         'avatar_url',    // For PUT /users/me (Page 6)
         'phone_number',  // For PUT /users/me (Page 6)
     ];
